@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Download, FileText, Send, Check, Edit3, Eye, Users, Settings } from 'lucide-react';
+import { Download, FileText, Send, Check, Edit3, Eye, Users, Settings, X } from 'lucide-react';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 const ContractDashboard = () => {
   const [activeTab, setActiveTab] = useState('builder');
@@ -11,7 +13,7 @@ const ContractDashboard = () => {
     clientCompany: '',
     clientAddress: '',
     clientCity: '',
-    clientState: 'TX',
+    clientState: '',
     clientZip: '',
     clientEmail: '',
     clientPhone: '',
@@ -102,6 +104,8 @@ const ContractDashboard = () => {
   const [generatedContracts, setGeneratedContracts] = useState<any[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [signingContracts, setSigningContracts] = useState<any[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [previewModal, setPreviewModal] = useState<{ isOpen: boolean; contract: any }>({ isOpen: false, contract: null });
 
   const handleInputChange = (field: string, value: string | boolean) => {
     if (field.includes('.')) {
@@ -137,8 +141,193 @@ const ContractDashboard = () => {
     return 'CTR-' + Date.now().toString(36).toUpperCase() + '-' + Math.random().toString(36).substring(2, 7).toUpperCase();
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const generateMilestonesHTML = (milestones: any[]) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return milestones.map((milestone: any, index: number) => `
+      <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #e5e7eb; border-radius: 8px;">
+        <h4 style="color: #374151; margin-bottom: 10px;">${index + 1}. ${milestone.name}</h4>
+        <p><strong>Description:</strong> ${milestone.description}</p>
+        <p><strong>Deliverable:</strong> ${milestone.deliverable}</p>
+        <p><strong>Payment:</strong> ${milestone.payment}% of total project cost</p>
+        ${milestone.dueDate ? `<p><strong>Due Date:</strong> ${milestone.dueDate}</p>` : ''}
+      </div>
+    `).join('');
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const generateContractContent = (data: any) => {
+    const selectedServices = [];
+
+    // Collect selected services
+    if (data.services.websiteDesign) {
+      const designDetails = [];
+      if (data.designServices.uiuxConsultation) designDetails.push("UI/UX Design Consultation");
+      if (data.designServices.customMockups) designDetails.push("Custom Design Mockups");
+      if (data.designServices.responsiveDesign) designDetails.push("Responsive Design");
+      if (data.designServices.brandIntegration) designDetails.push("Brand Integration");
+      selectedServices.push(`Website Design${designDetails.length > 0 ? ` (${designDetails.join(', ')})` : ''}`);
+    }
+
+    if (data.services.websiteDevelopment) {
+      const devDetails = [];
+      if (data.developmentServices.frontendDev) devDetails.push("Frontend Development");
+      if (data.developmentServices.backendDev) devDetails.push("Backend Development");
+      if (data.developmentServices.cmsIntegration) devDetails.push("CMS Integration");
+      if (data.developmentServices.ecommerce) devDetails.push("E-commerce Functionality");
+      selectedServices.push(`Website Development${devDetails.length > 0 ? ` (${devDetails.join(', ')})` : ''}`);
+    }
+
+    if (data.services.websiteMaintenance) {
+      const maintenanceDetails = [];
+      if (data.maintenanceServices.regularUpdates) maintenanceDetails.push("Regular Updates & Security Patches");
+      if (data.maintenanceServices.contentUpdates) maintenanceDetails.push("Content Updates");
+      if (data.maintenanceServices.performanceMonitoring) maintenanceDetails.push("Performance Monitoring");
+      selectedServices.push(`Website Maintenance${maintenanceDetails.length > 0 ? ` (${maintenanceDetails.join(', ')})` : ''}`);
+    }
+
+    return `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 40px;">
+        <div style="text-align: center; margin-bottom: 40px;">
+          <h1 style="color: #2563eb; margin-bottom: 10px;">WEB DEVELOPMENT SERVICE AGREEMENT</h1>
+          <p style="color: #666; font-size: 14px;">Contract ID: ${data.contractNumber || 'N/A'}</p>
+          <p style="color: #666; font-size: 14px;">Date: ${new Date(data.contractDate).toLocaleDateString()}</p>
+        </div>
+
+        <div style="margin-bottom: 30px;">
+          <h2 style="color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">PARTIES</h2>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px;">
+            <div>
+              <h3 style="color: #374151; margin-bottom: 10px;">Service Provider:</h3>
+              <p><strong>elgAtoAi</strong><br>
+              Dallas, TX<br>
+              Email: odmustafa@gmail.com</p>
+            </div>
+            <div>
+              <h3 style="color: #374151; margin-bottom: 10px;">Client:</h3>
+              <p><strong>${data.clientName}</strong><br>
+              ${data.clientCompany ? `${data.clientCompany}<br>` : ''}
+              ${data.clientAddress ? `${data.clientAddress}<br>` : ''}
+              ${data.clientCity ? `${data.clientCity}, ` : ''}${data.clientState} ${data.clientZip}<br>
+              Email: ${data.clientEmail}<br>
+              Phone: ${data.clientPhone}</p>
+            </div>
+          </div>
+        </div>
+
+        ${data.includedSections.projectOverview ? `
+        <div style="margin-bottom: 30px;">
+          <h2 style="color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">PROJECT OVERVIEW</h2>
+          <h3 style="color: #374151; margin-top: 20px;">Project Name:</h3>
+          <p>${data.projectName}</p>
+
+          <h3 style="color: #374151; margin-top: 20px;">Project Description:</h3>
+          <p>${data.projectDescription || 'No description provided.'}</p>
+
+          <h3 style="color: #374151; margin-top: 20px;">Services Included:</h3>
+          <ul style="margin-left: 20px;">
+            ${selectedServices.map(service => `<li>${service}</li>`).join('')}
+          </ul>
+
+          <h3 style="color: #374151; margin-top: 20px;">Total Project Cost:</h3>
+          <p style="font-size: 18px; font-weight: bold; color: #059669;">$${data.totalCost}</p>
+        </div>
+        ` : ''}
+
+        ${data.includedSections.timeline ? `
+        <div style="margin-bottom: 30px;">
+          <h2 style="color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">PROJECT TIMELINE & MILESTONES</h2>
+          <div style="margin-top: 20px;">
+            ${generateMilestonesHTML(data.milestones)}
+          </div>
+        </div>
+        ` : ''}
+
+        ${data.includedSections.paymentTerms ? `
+        <div style="margin-bottom: 30px;">
+          <h2 style="color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">PAYMENT TERMS</h2>
+          <div style="margin-top: 20px;">
+            <p><strong>Total Project Cost:</strong> $${data.totalCost}</p>
+            <p><strong>Payment Schedule:</strong> Payments are due according to the milestone schedule outlined above.</p>
+            <p><strong>Payment Terms:</strong> Net ${data.paymentTerms} days from invoice date.</p>
+            <p><strong>Late Payment:</strong> A late fee of 1.5% per month may be applied to overdue amounts.</p>
+            <p><strong>Payment Methods:</strong> Check, ACH transfer, or other mutually agreed upon methods.</p>
+          </div>
+        </div>
+        ` : ''}
+
+        ${data.includedSections.clientResponsibilities ? `
+        <div style="margin-bottom: 30px;">
+          <h2 style="color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">CLIENT RESPONSIBILITIES</h2>
+          <ul style="margin-left: 20px; margin-top: 20px;">
+            <li>Provide all necessary content, materials, and information in a timely manner</li>
+            <li>Respond to requests for feedback and approval within 5 business days</li>
+            <li>Provide access to existing systems, accounts, and platforms as needed</li>
+            <li>Make payments according to the agreed schedule</li>
+            <li>Communicate any changes or concerns promptly</li>
+          </ul>
+        </div>
+        ` : ''}
+
+        ${data.includedSections.elgatoaiResponsibilities ? `
+        <div style="margin-bottom: 30px;">
+          <h2 style="color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">ELGATOAI RESPONSIBILITIES</h2>
+          <ul style="margin-left: 20px; margin-top: 20px;">
+            <li>Deliver services according to the agreed timeline and specifications</li>
+            <li>Provide regular updates on project progress</li>
+            <li>Ensure all work meets professional industry standards</li>
+            <li>Provide documentation and training as specified</li>
+            <li>Maintain confidentiality of client information</li>
+            <li>Provide post-launch support as outlined in the agreement</li>
+          </ul>
+        </div>
+        ` : ''}
+
+        ${data.includedSections.intellectualProperty ? `
+        <div style="margin-bottom: 30px;">
+          <h2 style="color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">INTELLECTUAL PROPERTY</h2>
+          <p style="margin-top: 20px;">Upon full payment of all fees, the Client will own all custom work product created specifically for this project. elgAtoAi retains rights to general methodologies, techniques, and any pre-existing intellectual property. Third-party components remain subject to their respective licenses.</p>
+        </div>
+        ` : ''}
+
+        ${data.includedSections.warranty ? `
+        <div style="margin-bottom: 30px;">
+          <h2 style="color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">WARRANTY & SUPPORT</h2>
+          <p style="margin-top: 20px;">elgAtoAi warrants that all services will be performed in a professional manner. We provide a 30-day warranty period for bug fixes on delivered work. This warranty does not cover issues arising from client modifications, third-party changes, or hosting environment changes.</p>
+        </div>
+        ` : ''}
+
+        ${data.includedSections.termination ? `
+        <div style="margin-bottom: 30px;">
+          <h2 style="color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">TERMINATION</h2>
+          <p style="margin-top: 20px;">Either party may terminate this agreement with 30 days written notice. In case of termination, the Client will pay for all work completed up to the termination date. All deliverables completed and paid for will be provided to the Client.</p>
+        </div>
+        ` : ''}
+
+        <div style="margin-top: 50px; padding-top: 30px; border-top: 2px solid #e5e7eb;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 50px;">
+            <div>
+              <h3 style="color: #374151; margin-bottom: 20px;">Client Signature:</h3>
+              <div style="border-bottom: 1px solid #000; width: 200px; margin-bottom: 10px; height: 30px;"></div>
+              <p style="font-size: 12px;">Date: _______________</p>
+              <p style="font-size: 14px; margin-top: 10px;">${data.clientName}</p>
+            </div>
+            <div>
+              <h3 style="color: #374151; margin-bottom: 20px;">Service Provider:</h3>
+              <div style="border-bottom: 1px solid #000; width: 200px; margin-bottom: 10px; height: 30px;"></div>
+              <p style="font-size: 12px;">Date: _______________</p>
+              <p style="font-size: 14px; margin-top: 10px;">elgAtoAi</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  };
+
   const generateContract = () => {
     const contractId = generateContractId();
+    const contractContent = generateContractContent(contractData);
+
     const newContract = {
       id: contractId,
       clientName: contractData.clientName,
@@ -147,11 +336,71 @@ const ContractDashboard = () => {
       createdDate: new Date().toLocaleDateString(),
       status: 'draft',
       signableUrl: `https://contracts.elgatoai.com/sign/${contractId}`,
-      data: contractData
+      data: contractData,
+      content: contractContent
     };
 
     setGeneratedContracts(prev => [newContract, ...prev]);
     setActiveTab('contracts');
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const openPreview = (contract: any) => {
+    setPreviewModal({ isOpen: true, contract });
+  };
+
+  const closePreview = () => {
+    setPreviewModal({ isOpen: false, contract: null });
+  };
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const downloadPDF = async (contract: any) => {
+    try {
+      // Create a temporary div to render the contract content
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = contract.content || generateContractContent(contract.data);
+      tempDiv.style.position = 'absolute';
+      tempDiv.style.left = '-9999px';
+      tempDiv.style.top = '-9999px';
+      tempDiv.style.width = '800px';
+      document.body.appendChild(tempDiv);
+
+      // Convert to canvas
+      const canvas = await html2canvas(tempDiv, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true
+      });
+
+      // Create PDF
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgData = canvas.toDataURL('image/png');
+      const imgWidth = 210;
+      const pageHeight = 295;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+
+      let position = 0;
+
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      // Clean up
+      document.body.removeChild(tempDiv);
+
+      // Download
+      pdf.save(`Contract-${contract.id}.pdf`);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Error generating PDF. Please try again.');
+    }
   };
 
   const sendForSigning = (contractId: string) => {
@@ -454,11 +703,17 @@ const ContractDashboard = () => {
                     <p className="text-gray-600 text-sm">Created: {contract.createdDate}</p>
                   </div>
                   <div className="flex space-x-2">
-                    <button className="flex items-center space-x-1 px-3 py-2 text-blue-600 hover:bg-blue-50 rounded">
+                    <button
+                      onClick={() => openPreview(contract)}
+                      className="flex items-center space-x-1 px-3 py-2 text-blue-600 hover:bg-blue-50 rounded"
+                    >
                       <Eye size={16} />
                       <span>Preview</span>
                     </button>
-                    <button className="flex items-center space-x-1 px-3 py-2 text-green-600 hover:bg-green-50 rounded">
+                    <button
+                      onClick={() => downloadPDF(contract)}
+                      className="flex items-center space-x-1 px-3 py-2 text-green-600 hover:bg-green-50 rounded"
+                    >
                       <Download size={16} />
                       <span>PDF</span>
                     </button>
@@ -559,11 +814,17 @@ const ContractDashboard = () => {
                     <p className="text-gray-600 mb-1">Signed: {contract.signedDate}</p>
                   </div>
                   <div className="flex space-x-2">
-                    <button className="flex items-center space-x-1 px-3 py-2 text-blue-600 hover:bg-blue-50 rounded">
+                    <button
+                      onClick={() => openPreview(contract)}
+                      className="flex items-center space-x-1 px-3 py-2 text-blue-600 hover:bg-blue-50 rounded"
+                    >
                       <Eye size={16} />
                       <span>View</span>
                     </button>
-                    <button className="flex items-center space-x-1 px-3 py-2 text-green-600 hover:bg-green-50 rounded">
+                    <button
+                      onClick={() => downloadPDF(contract)}
+                      className="flex items-center space-x-1 px-3 py-2 text-green-600 hover:bg-green-50 rounded"
+                    >
                       <Download size={16} />
                       <span>PDF</span>
                     </button>
@@ -576,6 +837,48 @@ const ContractDashboard = () => {
       </div>
     </div>
   );
+
+  const renderPreviewModal = () => {
+    if (!previewModal.isOpen || !previewModal.contract) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden">
+          <div className="flex justify-between items-center p-6 border-b">
+            <h2 className="text-xl font-semibold">Contract Preview - {previewModal.contract.projectName}</h2>
+            <button
+              onClick={closePreview}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              <X size={24} />
+            </button>
+          </div>
+          <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+            <div
+              dangerouslySetInnerHTML={{
+                __html: previewModal.contract.content || generateContractContent(previewModal.contract.data)
+              }}
+            />
+          </div>
+          <div className="flex justify-end space-x-3 p-6 border-t bg-gray-50">
+            <button
+              onClick={() => downloadPDF(previewModal.contract)}
+              className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+            >
+              <Download size={16} />
+              <span>Download PDF</span>
+            </button>
+            <button
+              onClick={closePreview}
+              className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
@@ -669,6 +972,9 @@ const ContractDashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Preview Modal */}
+      {renderPreviewModal()}
     </div>
   );
 };
