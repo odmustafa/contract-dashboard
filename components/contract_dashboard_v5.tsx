@@ -4,9 +4,17 @@ import React, { useState } from 'react';
 import { Download, FileText, Send, Check, Edit3, Eye, Users, Settings, X } from 'lucide-react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { useQuery, useMutation } from "convex/react";
+import { api } from "../convex/_generated/api";
+import { Id } from "../convex/_generated/dataModel";
 
 const ContractDashboard = () => {
   const [activeTab, setActiveTab] = useState('builder');
+
+  // Convex queries and mutations
+  const allContracts = useQuery(api.contracts.getContracts) || [];
+  const createContract = useMutation(api.contracts.createContract);
+  const updateContractStatus = useMutation(api.contracts.updateContractStatus);
   const [contractData, setContractData] = useState({
     // Client Information
     clientName: '',
@@ -100,10 +108,11 @@ const ContractDashboard = () => {
     }
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [generatedContracts, setGeneratedContracts] = useState<any[]>([]);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [signingContracts, setSigningContracts] = useState<any[]>([]);
+  // Computed values from Convex data
+  const generatedContracts = allContracts.filter(contract => contract.status === 'draft');
+  const signingContracts = allContracts.filter(contract => contract.status === 'sent_for_signing');
+  const signedContracts = allContracts.filter(contract => contract.status === 'signed');
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [previewModal, setPreviewModal] = useState<{ isOpen: boolean; contract: any }>({ isOpen: false, contract: null });
 
@@ -324,24 +333,48 @@ const ContractDashboard = () => {
     `;
   };
 
-  const generateContract = () => {
+  const generateContract = async () => {
     const contractId = generateContractId();
     const contractContent = generateContractContent(contractData);
 
-    const newContract = {
-      id: contractId,
-      clientName: contractData.clientName,
-      projectName: contractData.projectName,
-      totalCost: contractData.totalCost,
-      createdDate: new Date().toLocaleDateString(),
-      status: 'draft',
-      signableUrl: `https://contracts.elgatoai.com/sign/${contractId}`,
-      data: contractData,
-      content: contractContent
-    };
+    try {
+      await createContract({
+        contractId,
+        clientName: contractData.clientName,
+        clientCompany: contractData.clientCompany,
+        clientAddress: contractData.clientAddress,
+        clientCity: contractData.clientCity,
+        clientState: contractData.clientState,
+        clientZip: contractData.clientZip,
+        clientEmail: contractData.clientEmail,
+        clientPhone: contractData.clientPhone,
+        contractDate: contractData.contractDate,
+        projectName: contractData.projectName,
+        contractNumber: contractData.contractNumber,
+        projectDescription: contractData.projectDescription,
+        totalCost: contractData.totalCost,
+        services: contractData.services,
+        designServices: contractData.designServices,
+        developmentServices: contractData.developmentServices,
+        maintenanceServices: contractData.maintenanceServices,
+        additionalServicesDetail: contractData.additionalServicesDetail,
+        milestones: contractData.milestones,
+        depositAmount: contractData.depositAmount,
+        finalAmount: contractData.finalAmount,
+        maintenanceFee: contractData.maintenanceFee,
+        hourlyRate: contractData.hourlyRate,
+        paymentTerms: contractData.paymentTerms,
+        includedSections: contractData.includedSections,
+        signableUrl: `https://contracts.elgatoai.com/sign/${contractId}`,
+        content: contractContent,
+        createdDate: new Date().toLocaleDateString(),
+      });
 
-    setGeneratedContracts(prev => [newContract, ...prev]);
-    setActiveTab('contracts');
+      setActiveTab('contracts');
+    } catch (error) {
+      console.error('Error creating contract:', error);
+      alert('Error creating contract. Please try again.');
+    }
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -403,35 +436,45 @@ const ContractDashboard = () => {
     }
   };
 
-  const sendForSigning = (contractId: string) => {
-    const contract = generatedContracts.find(c => c.id === contractId);
+  const sendForSigning = async (contractId: string) => {
+    const contract = allContracts.find(c => c.contractId === contractId);
     if (contract) {
-      const signingContract = {
-        ...contract,
-        status: 'sent_for_signing',
-        sentDate: new Date().toLocaleDateString(),
-        expirationDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()
-      };
+      try {
+        await updateContractStatus({
+          id: contract._id,
+          status: 'sent_for_signing',
+          sentDate: new Date().toLocaleDateString(),
+          expirationDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString()
+        });
 
-      setSigningContracts(prev => [signingContract, ...prev]);
-      setGeneratedContracts(prev => prev.map(c =>
-        c.id === contractId ? { ...c, status: 'sent_for_signing' } : c
-      ));
-
-      setTimeout(() => {
-        alert(`Contract sent to ${contract.data.clientEmail} and odmustafa@gmail.com`);
-      }, 1000);
+        setTimeout(() => {
+          alert(`Contract sent to ${contract.clientEmail} and odmustafa@gmail.com`);
+        }, 1000);
+      } catch (error) {
+        console.error('Error updating contract status:', error);
+        alert('Error sending contract. Please try again.');
+      }
     }
   };
 
-  const simulateSignature = (contractId: string) => {
-    setSigningContracts(prev => prev.map(c =>
-      c.id === contractId ? { ...c, status: 'signed', signedDate: new Date().toLocaleDateString() } : c
-    ));
+  const simulateSignature = async (contractId: string) => {
+    const contract = allContracts.find(c => c.contractId === contractId);
+    if (contract) {
+      try {
+        await updateContractStatus({
+          id: contract._id,
+          status: 'signed',
+          signedDate: new Date().toLocaleDateString()
+        });
 
-    setTimeout(() => {
-      alert(`Contract signed! Notifications sent to client and odmustafa@gmail.com`);
-    }, 1000);
+        setTimeout(() => {
+          alert(`Contract signed! Notifications sent to client and odmustafa@gmail.com`);
+        }, 1000);
+      } catch (error) {
+        console.error('Error updating contract status:', error);
+        alert('Error signing contract. Please try again.');
+      }
+    }
   };
 
   const ServiceCheckbox = ({ label, checked, onChange, description }: {
@@ -685,7 +728,7 @@ const ContractDashboard = () => {
         ) : (
           <div className="space-y-4">
             {generatedContracts.map(contract => (
-              <div key={contract.id} className="border rounded-lg p-4 hover:bg-gray-50">
+              <div key={contract._id} className="border rounded-lg p-4 hover:bg-gray-50">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
@@ -698,7 +741,7 @@ const ContractDashboard = () => {
                       </span>
                     </div>
                     <p className="text-gray-600 mb-1">Client: {contract.clientName}</p>
-                    <p className="text-gray-600 mb-1">Contract ID: {contract.id}</p>
+                    <p className="text-gray-600 mb-1">Contract ID: {contract.contractId}</p>
                     <p className="text-gray-600 mb-1">Total: ${contract.totalCost}</p>
                     <p className="text-gray-600 text-sm">Created: {contract.createdDate}</p>
                   </div>
@@ -719,7 +762,7 @@ const ContractDashboard = () => {
                     </button>
                     {contract.status === 'draft' && (
                       <button
-                        onClick={() => sendForSigning(contract.id)}
+                        onClick={() => sendForSigning(contract.contractId)}
                         className="flex items-center space-x-1 px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                       >
                         <Send size={16} />
@@ -752,7 +795,7 @@ const ContractDashboard = () => {
         ) : (
           <div className="space-y-4">
             {signingContracts.filter(c => c.status === 'sent_for_signing').map(contract => (
-              <div key={contract.id} className="border rounded-lg p-4">
+              <div key={contract._id} className="border rounded-lg p-4">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <h3 className="font-semibold text-lg mb-2">{contract.projectName}</h3>
@@ -767,7 +810,7 @@ const ContractDashboard = () => {
                   </div>
                   <div className="flex space-x-2">
                     <button
-                      onClick={() => simulateSignature(contract.id)}
+                      onClick={() => simulateSignature(contract.contractId)}
                       className="flex items-center space-x-1 px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700"
                     >
                       <Check size={16} />
@@ -798,8 +841,8 @@ const ContractDashboard = () => {
           </div>
         ) : (
           <div className="space-y-4">
-            {signingContracts.filter(c => c.status === 'signed').map(contract => (
-              <div key={contract.id} className="border rounded-lg p-4 bg-green-50 border-green-200">
+            {signedContracts.map(contract => (
+              <div key={contract._id} className="border rounded-lg p-4 bg-green-50 border-green-200">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
@@ -809,7 +852,7 @@ const ContractDashboard = () => {
                       </span>
                     </div>
                     <p className="text-gray-600 mb-1">Client: {contract.clientName}</p>
-                    <p className="text-gray-600 mb-1">Contract ID: {contract.id}</p>
+                    <p className="text-gray-600 mb-1">Contract ID: {contract.contractId}</p>
                     <p className="text-gray-600 mb-1">Total: ${contract.totalCost}</p>
                     <p className="text-gray-600 mb-1">Signed: {contract.signedDate}</p>
                   </div>
@@ -955,15 +998,15 @@ const ContractDashboard = () => {
             <div className="flex space-x-4 sm:space-x-6">
               <span className="flex items-center space-x-1">
                 <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-                <span>Draft: {generatedContracts.filter(c => c.status === 'draft').length}</span>
+                <span>Draft: {generatedContracts.length}</span>
               </span>
               <span className="flex items-center space-x-1">
                 <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
-                <span>Pending: {signingContracts.filter(c => c.status === 'sent_for_signing').length}</span>
+                <span>Pending: {signingContracts.length}</span>
               </span>
               <span className="flex items-center space-x-1">
                 <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                <span>Signed: {signingContracts.filter(c => c.status === 'signed').length}</span>
+                <span>Signed: {signedContracts.length}</span>
               </span>
             </div>
             <div className="text-xs text-gray-500 hidden sm:block">
