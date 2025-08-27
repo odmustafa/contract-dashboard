@@ -3,10 +3,9 @@
 import React, { useState } from 'react';
 import { Download, FileText, Send, Check, Edit3, Eye, Users, Settings, X } from 'lucide-react';
 import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../convex/_generated/api";
-import { Id } from "../convex/_generated/dataModel";
 
 const ContractDashboard = () => {
   const [activeTab, setActiveTab] = useState('builder');
@@ -204,7 +203,7 @@ const ContractDashboard = () => {
         </div>
 
         <div style="margin-bottom: 30px;">
-          <h2 style="color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">PARTIES</h2>
+          <h2 style="color: #000000 !important; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">PARTIES</h2>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px;">
             <div>
               <h3 style="color: #374151; margin-bottom: 10px;">Service Provider:</h3>
@@ -226,7 +225,7 @@ const ContractDashboard = () => {
 
         ${data.includedSections.projectOverview ? `
         <div style="margin-bottom: 30px;">
-          <h2 style="color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">PROJECT OVERVIEW</h2>
+          <h2 style="color: #000000 !important; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">PROJECT OVERVIEW</h2>
           <h3 style="color: #374151; margin-top: 20px;">Project Name:</h3>
           <p>${data.projectName}</p>
 
@@ -245,7 +244,7 @@ const ContractDashboard = () => {
 
         ${data.includedSections.timeline ? `
         <div style="margin-bottom: 30px;">
-          <h2 style="color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">PROJECT TIMELINE & MILESTONES</h2>
+          <h2 style="color: #000000 !important; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">PROJECT TIMELINE & MILESTONES</h2>
           <div style="margin-top: 20px;">
             ${generateMilestonesHTML(data.milestones)}
           </div>
@@ -254,7 +253,7 @@ const ContractDashboard = () => {
 
         ${data.includedSections.paymentTerms ? `
         <div style="margin-bottom: 30px;">
-          <h2 style="color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">PAYMENT TERMS</h2>
+          <h2 style="color: #000000 !important; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">PAYMENT TERMS</h2>
           <div style="margin-top: 20px;">
             <p><strong>Total Project Cost:</strong> $${data.totalCost}</p>
             <p><strong>Payment Schedule:</strong> Payments are due according to the milestone schedule outlined above.</p>
@@ -267,7 +266,7 @@ const ContractDashboard = () => {
 
         ${data.includedSections.clientResponsibilities ? `
         <div style="margin-bottom: 30px;">
-          <h2 style="color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">CLIENT RESPONSIBILITIES</h2>
+          <h2 style="color: #000000 !important; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">CLIENT RESPONSIBILITIES</h2>
           <ul style="margin-left: 20px; margin-top: 20px;">
             <li>Provide all necessary content, materials, and information in a timely manner</li>
             <li>Respond to requests for feedback and approval within 5 business days</li>
@@ -280,7 +279,7 @@ const ContractDashboard = () => {
 
         ${data.includedSections.elgatoaiResponsibilities ? `
         <div style="margin-bottom: 30px;">
-          <h2 style="color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">ELGATOAI RESPONSIBILITIES</h2>
+          <h2 style="color: #000000 !important; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">ELGATOAI RESPONSIBILITIES</h2>
           <ul style="margin-left: 20px; margin-top: 20px;">
             <li>Deliver services according to the agreed timeline and specifications</li>
             <li>Provide regular updates on project progress</li>
@@ -294,21 +293,21 @@ const ContractDashboard = () => {
 
         ${data.includedSections.intellectualProperty ? `
         <div style="margin-bottom: 30px;">
-          <h2 style="color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">INTELLECTUAL PROPERTY</h2>
+          <h2 style="color: #000000 !important; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">INTELLECTUAL PROPERTY</h2>
           <p style="margin-top: 20px;">Upon full payment of all fees, the Client will own all custom work product created specifically for this project. elgAtoAi retains rights to general methodologies, techniques, and any pre-existing intellectual property. Third-party components remain subject to their respective licenses.</p>
         </div>
         ` : ''}
 
         ${data.includedSections.warranty ? `
         <div style="margin-bottom: 30px;">
-          <h2 style="color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">WARRANTY & SUPPORT</h2>
+          <h2 style="color: #000000 !important; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">WARRANTY & SUPPORT</h2>
           <p style="margin-top: 20px;">elgAtoAi warrants that all services will be performed in a professional manner. We provide a 30-day warranty period for bug fixes on delivered work. This warranty does not cover issues arising from client modifications, third-party changes, or hosting environment changes.</p>
         </div>
         ` : ''}
 
         ${data.includedSections.termination ? `
         <div style="margin-bottom: 30px;">
-          <h2 style="color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">TERMINATION</h2>
+          <h2 style="color: #000000 !important; border-bottom: 2px solid #e5e7eb; padding-bottom: 10px;">TERMINATION</h2>
           <p style="margin-top: 20px;">Either party may terminate this agreement with 30 days written notice. In case of termination, the Client will pay for all work completed up to the termination date. All deliverables completed and paid for will be provided to the Client.</p>
         </div>
         ` : ''}
@@ -389,47 +388,440 @@ const ContractDashboard = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const downloadPDF = async (contract: any) => {
     try {
-      // Create a temporary div to render the contract content
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = contract.content || generateContractContent(contract.data);
-      tempDiv.style.position = 'absolute';
-      tempDiv.style.left = '-9999px';
-      tempDiv.style.top = '-9999px';
-      tempDiv.style.width = '800px';
-      document.body.appendChild(tempDiv);
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = 210;
+      const pageHeight = 297;
+      const margin = 25;
+      const contentWidth = pageWidth - (margin * 2);
+      let currentY = margin;
+      let pageNumber = 1;
 
-      // Convert to canvas
-      const canvas = await html2canvas(tempDiv, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: true
+      // Helper function to add text with word wrapping
+      const addText = (text: string, x: number, y: number, options: { fontSize?: number; fontStyle?: string; maxWidth?: number; align?: string } = {}) => {
+        const fontSize = options.fontSize || 12;
+        const fontStyle = options.fontStyle || 'normal';
+        const maxWidth = options.maxWidth || contentWidth;
+        const align = options.align || 'left';
+
+        pdf.setFontSize(fontSize);
+        pdf.setFont('times', fontStyle);
+
+        const lines = pdf.splitTextToSize(text, maxWidth);
+
+        if (align === 'center') {
+          lines.forEach((line: string, index: number) => {
+            const textWidth = pdf.getTextWidth(line);
+            const xPos = (pageWidth - textWidth) / 2;
+            pdf.text(line, xPos, y + (index * fontSize * 0.4));
+          });
+        } else {
+          pdf.text(lines, x, y);
+        }
+
+        return y + (lines.length * fontSize * 0.4); // Return new Y position
+      };
+
+      // Helper function to start a new page
+      const newPage = () => {
+        pdf.addPage();
+        pageNumber++;
+        currentY = margin;
+      };
+
+      // Helper function to add a heading (H2 always starts new page)
+      const addHeading = (text: string, level: number = 1) => {
+        if (level === 2) {
+          newPage();
+        } else if (currentY > pageHeight - 50) {
+          newPage();
+        }
+
+        const fontSize = level === 1 ? 16 : level === 2 ? 14 : 12;
+        const fontStyle = 'bold';
+
+        currentY += level === 1 ? 15 : 10;
+        currentY = addText(text, margin, currentY, { fontSize, fontStyle });
+        currentY += 8;
+
+        // Add underline for h2
+        if (level === 2) {
+          pdf.setLineWidth(0.5);
+          pdf.line(margin, currentY - 3, pageWidth - margin, currentY - 3);
+          currentY += 8;
+        }
+      };
+
+      // Helper function to add a paragraph
+      const addParagraph = (text: string, options: { fontSize?: number; fontStyle?: string; align?: string } = {}) => {
+        if (currentY > pageHeight - 40) {
+          newPage();
+        }
+
+        currentY = addText(text, margin, currentY, { fontSize: 12, ...options });
+        currentY += 6;
+      };
+
+      // Helper function to add a list
+      const addList = (items: string[]) => {
+        items.forEach(item => {
+          if (currentY > pageHeight - 30) {
+            newPage();
+          }
+          currentY = addText(`• ${item}`, margin + 5, currentY, { fontSize: 12 });
+          currentY += 4;
+        });
+        currentY += 6;
+      };
+
+      // Get contract data
+      const data = contract.data || contract;
+
+      // COVER PAGE
+      currentY = 30;
+
+      // Logo placeholder - moved to top left
+      pdf.setFillColor(240, 240, 240);
+      pdf.rect(margin, currentY, 50, 25, 'F');
+      pdf.setFontSize(9);
+      pdf.setFont('times', 'normal');
+      pdf.text('elgAtoAi Logo', margin + 12, currentY + 15);
+
+      currentY += 50;
+
+      // Main title - moved up and made smaller
+      addText('WEB DEVELOPMENT SERVICE AGREEMENT', 0, currentY, {
+        fontSize: 14,
+        fontStyle: 'bold',
+        align: 'center'
+      });
+      currentY += 20;
+
+      // Contract Information Section - moved up and made more compact
+      addText('CONTRACT INFORMATION', margin, currentY, { fontSize: 12, fontStyle: 'bold' });
+      currentY += 10;
+
+      addText(`Project Name: ${data.projectName}`, margin, currentY, { fontSize: 10 });
+      currentY += 4;
+      addText(`Contract Number: ${data.contractId || data.contractNumber || 'N/A'}`, margin, currentY, { fontSize: 10 });
+      currentY += 4;
+      addText(`Contract Date: ${new Date(data.contractDate).toLocaleDateString()}`, margin, currentY, { fontSize: 10 });
+      currentY += 4;
+      addText(`Date Created: ${data.createdDate || new Date().toLocaleDateString()}`, margin, currentY, { fontSize: 10 });
+      currentY += 4;
+      addText(`Date Sent: ${data.sentDate || '_____________'}`, margin, currentY, { fontSize: 10 });
+      currentY += 4;
+      addText(`Date Signed: ${data.signedDate || '_____________'}`, margin, currentY, { fontSize: 10 });
+
+      currentY += 15;
+
+      // Parties Information Section - moved up and made more compact
+      addText('PARTIES INVOLVED', margin, currentY, { fontSize: 12, fontStyle: 'bold' });
+      currentY += 10;
+
+      // Two columns for parties
+      const colWidth = contentWidth / 2 - 5;
+      addText('Service Provider:', margin, currentY, { fontSize: 10, fontStyle: 'bold' });
+      addText('Client:', margin + colWidth + 10, currentY, { fontSize: 10, fontStyle: 'bold' });
+      currentY += 6;
+
+      // Service provider info
+      addText('elgAtoAi', margin, currentY, { fontSize: 9 });
+      currentY += 3;
+      addText('Dallas, TX', margin, currentY, { fontSize: 9 });
+      currentY += 3;
+      addText('odmustafa@gmail.com', margin, currentY, { fontSize: 9 });
+
+      // Reset Y for client info (align with service provider)
+      const clientStartY = currentY - 6;
+      let clientY = clientStartY;
+
+      addText(`${data.clientName}`, margin + colWidth + 10, clientY, { fontSize: 9 });
+      clientY += 3;
+      if (data.clientCompany) {
+        addText(`${data.clientCompany}`, margin + colWidth + 10, clientY, { fontSize: 9 });
+        clientY += 3;
+      }
+      addText(`${data.clientEmail}`, margin + colWidth + 10, clientY, { fontSize: 9 });
+
+      currentY += 20;
+
+      // Confidentiality Notice Section - moved to bottom
+      addText('CONFIDENTIALITY NOTICE', 0, currentY, {
+        fontSize: 11,
+        fontStyle: 'bold',
+        align: 'center'
+      });
+      currentY += 10;
+
+      addText('This document contains confidential and proprietary information. Any unauthorized review, use, disclosure, or distribution is prohibited. If you have received this document in error, please contact the sender immediately and destroy all copies.', margin, currentY, { fontSize: 9 });
+
+      // TABLE OF CONTENTS PAGE
+      newPage();
+      currentY += 20;
+
+      addText('TABLE OF CONTENTS', 0, currentY, {
+        fontSize: 16,
+        fontStyle: 'bold',
+        align: 'center'
+      });
+      currentY += 30;
+
+      const tocItems = [
+        { title: 'Confidentiality Agreement', page: 3 },
+        { title: 'Parties', page: 4 },
+        { title: 'Project Overview', page: 4 },
+        { title: 'Project Timeline & Milestones', page: 5 },
+        { title: 'Payment Terms', page: 6 },
+        { title: 'Client Responsibilities', page: 7 },
+        { title: 'elgAtoAi Responsibilities', page: 7 },
+        { title: 'Intellectual Property', page: 8 },
+        { title: 'Warranty & Support', page: 8 },
+        { title: 'Termination', page: 9 },
+        { title: 'Signatures', page: 9 }
+      ];
+
+      tocItems.forEach(item => {
+        pdf.setFont('times', 'normal');
+        pdf.text(item.title, margin, currentY);
+
+        // Add dots
+        const titleWidth = pdf.getTextWidth(item.title);
+        const pageNumWidth = pdf.getTextWidth(item.page.toString());
+        const dotsWidth = contentWidth - titleWidth - pageNumWidth - 10;
+        const numDots = Math.floor(dotsWidth / 3);
+        const dots = '.'.repeat(numDots);
+
+        pdf.text(dots, margin + titleWidth + 5, currentY);
+        pdf.text(item.page.toString(), pageWidth - margin - pageNumWidth, currentY);
+        currentY += 8;
       });
 
-      // Create PDF
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const imgData = canvas.toDataURL('image/png');
-      const imgWidth = 210;
-      const pageHeight = 295;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      let heightLeft = imgHeight;
+      // CONFIDENTIALITY AGREEMENT PAGE
+      newPage();
+      currentY += 20;
 
-      let position = 0;
+      addText('CONFIDENTIALITY AGREEMENT', 0, currentY, {
+        fontSize: 16,
+        fontStyle: 'bold',
+        align: 'center'
+      });
+      currentY += 25;
 
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
+      addParagraph('This Confidentiality Agreement ("Agreement") is entered into between elgAtoAi ("Service Provider") and the Client identified in this contract ("Client") to protect confidential information that may be disclosed during the course of this project.');
 
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
+      addParagraph('1. CONFIDENTIAL INFORMATION: Any and all information, data, materials, products, technology, computer programs, specifications, manuals, business plans, software, marketing plans, financial information, or other information disclosed by either party, whether orally, in writing, or in any other form.');
+
+      addParagraph('2. OBLIGATIONS: Both parties agree to: (a) Hold all confidential information in strict confidence; (b) Not disclose confidential information to third parties without written consent; (c) Use confidential information solely for the purposes of this project; (d) Take reasonable precautions to protect confidential information.');
+
+      addParagraph('3. TERM: This agreement shall remain in effect for the duration of the project and for three (3) years thereafter.');
+
+      addParagraph('4. RETURN OF MATERIALS: Upon termination of this agreement, both parties shall return or destroy all confidential information and materials.');
+
+      currentY += 20;
+
+      // Signature section for confidentiality
+      addText('SIGNATURES', margin, currentY, { fontSize: 12, fontStyle: 'bold' });
+      currentY += 20;
+
+      // Two columns for signatures
+      addText('Client Signature:', margin, currentY, { fontSize: 11, fontStyle: 'bold' });
+      addText('Service Provider:', margin + 90, currentY, { fontSize: 11, fontStyle: 'bold' });
+      currentY += 20;
+
+      pdf.line(margin, currentY, margin + 70, currentY);
+      pdf.line(margin + 90, currentY, margin + 160, currentY);
+      currentY += 15;
+
+      addText('Date: _______________', margin, currentY, { fontSize: 10 });
+      addText('Date: _______________', margin + 90, currentY, { fontSize: 10 });
+
+      // CONTRACT CONTENT STARTS HERE
+      newPage();
+
+      // Parties Section
+      addHeading('PARTIES', 2);
+
+      addParagraph('This Web Development Service Agreement ("Agreement") is entered into between:', { fontStyle: 'bold' });
+      currentY += 5;
+
+      addParagraph('Service Provider:', { fontStyle: 'bold', fontSize: 12 });
+      addParagraph('elgAtoAi\nDallas, TX\nEmail: odmustafa@gmail.com', { fontSize: 12 });
+      currentY += 8;
+
+      addParagraph('Client:', { fontStyle: 'bold', fontSize: 12 });
+      let clientInfo = data.clientName;
+      if (data.clientCompany) clientInfo += `\n${data.clientCompany}`;
+      if (data.clientAddress) clientInfo += `\n${data.clientAddress}`;
+      if (data.clientCity || data.clientState || data.clientZip) {
+        clientInfo += `\n${data.clientCity ? data.clientCity + ', ' : ''}${data.clientState || ''} ${data.clientZip || ''}`;
+      }
+      clientInfo += `\nEmail: ${data.clientEmail}\nPhone: ${data.clientPhone}`;
+      addParagraph(clientInfo, { fontSize: 12 });
+
+      // Project Overview
+      if (data.includedSections?.projectOverview !== false) {
+        addHeading('PROJECT OVERVIEW', 2);
+
+        addParagraph('Project Name:', { fontStyle: 'bold', fontSize: 12 });
+        addParagraph(data.projectName, { fontSize: 12 });
+        currentY += 5;
+
+        if (data.projectDescription) {
+          addParagraph('Project Description:', { fontStyle: 'bold', fontSize: 12 });
+          addParagraph(data.projectDescription, { fontSize: 12 });
+          currentY += 5;
+        }
+
+        // Services
+        const selectedServices = [];
+        if (data.services?.websiteDesign) {
+          const designDetails = [];
+          if (data.designServices?.uiuxConsultation) designDetails.push("UI/UX Design Consultation");
+          if (data.designServices?.customMockups) designDetails.push("Custom Design Mockups");
+          if (data.designServices?.responsiveDesign) designDetails.push("Responsive Design");
+          if (data.designServices?.brandIntegration) designDetails.push("Brand Integration");
+          selectedServices.push(`Website Design${designDetails.length > 0 ? ` (${designDetails.join(', ')})` : ''}`);
+        }
+        if (data.services?.websiteDevelopment) {
+          const devDetails = [];
+          if (data.developmentServices?.frontendDev) devDetails.push("Frontend Development");
+          if (data.developmentServices?.backendDev) devDetails.push("Backend Development");
+          if (data.developmentServices?.cmsIntegration) devDetails.push("CMS Integration");
+          if (data.developmentServices?.ecommerce) devDetails.push("E-commerce Functionality");
+          selectedServices.push(`Website Development${devDetails.length > 0 ? ` (${devDetails.join(', ')})` : ''}`);
+        }
+        if (data.services?.websiteMaintenance) {
+          const maintenanceDetails = [];
+          if (data.maintenanceServices?.regularUpdates) maintenanceDetails.push("Regular Updates & Security Patches");
+          if (data.maintenanceServices?.contentUpdates) maintenanceDetails.push("Content Updates");
+          if (data.maintenanceServices?.performanceMonitoring) maintenanceDetails.push("Performance Monitoring");
+          selectedServices.push(`Website Maintenance${maintenanceDetails.length > 0 ? ` (${maintenanceDetails.join(', ')})` : ''}`);
+        }
+
+        if (selectedServices.length > 0) {
+          addParagraph('Services Included:', { fontStyle: 'bold', fontSize: 12 });
+          addList(selectedServices);
+        }
+
+        addParagraph('Total Project Cost:', { fontStyle: 'bold', fontSize: 12 });
+        addParagraph(`$${data.totalCost}`, { fontSize: 14, fontStyle: 'bold' });
       }
 
-      // Clean up
-      document.body.removeChild(tempDiv);
+      // Timeline & Milestones
+      if (data.includedSections?.timeline !== false && data.milestones) {
+        addHeading('PROJECT TIMELINE & MILESTONES', 2);
+        data.milestones.forEach((milestone: { name: string; description: string; deliverable: string; payment: string; dueDate?: string }, index: number) => {
+          addParagraph(`Milestone ${index + 1}: ${milestone.name}`, { fontStyle: 'bold', fontSize: 12 });
+          addParagraph(`Description: ${milestone.description}`, { fontSize: 12 });
+          addParagraph(`Deliverable: ${milestone.deliverable}`, { fontSize: 12 });
+          addParagraph(`Payment: ${milestone.payment}% of total project cost`, { fontSize: 12 });
+          if (milestone.dueDate) {
+            addParagraph(`Due Date: ${milestone.dueDate}`, { fontSize: 12 });
+          }
+          currentY += 8;
+        });
+      }
+
+      // Payment Terms
+      if (data.includedSections?.paymentTerms !== false) {
+        addHeading('PAYMENT TERMS', 2);
+        addParagraph(`Total Project Cost: $${data.totalCost}`, { fontStyle: 'bold', fontSize: 12 });
+        addParagraph('Payment Schedule: Payments are due according to the milestone schedule outlined above.', { fontSize: 12 });
+        addParagraph(`Payment Terms: Net ${data.paymentTerms || '30'} days from invoice date.`, { fontSize: 12 });
+        addParagraph('Late Payment: A late fee of 1.5% per month may be applied to overdue amounts.', { fontSize: 12 });
+        addParagraph('Payment Methods: Check, ACH transfer, or other mutually agreed upon methods.', { fontSize: 12 });
+      }
+
+      // Client Responsibilities
+      if (data.includedSections?.clientResponsibilities !== false) {
+        addHeading('CLIENT RESPONSIBILITIES', 2);
+        addParagraph('The Client agrees to the following responsibilities:', { fontSize: 12 });
+        const clientResponsibilities = [
+          'Provide all necessary content, materials, and information in a timely manner',
+          'Respond to requests for feedback and approval within 5 business days',
+          'Provide access to existing systems, accounts, and platforms as needed',
+          'Make payments according to the agreed schedule',
+          'Communicate any changes or concerns promptly'
+        ];
+        addList(clientResponsibilities);
+      }
+
+      // elgAtoAi Responsibilities
+      if (data.includedSections?.elgatoaiResponsibilities !== false) {
+        addHeading('ELGATOAI RESPONSIBILITIES', 2);
+        addParagraph('elgAtoAi agrees to the following responsibilities:', { fontSize: 12 });
+        const elgatoaiResponsibilities = [
+          'Deliver services according to the agreed timeline and specifications',
+          'Provide regular updates on project progress',
+          'Ensure all work meets professional industry standards',
+          'Provide documentation and training as specified',
+          'Maintain confidentiality of client information',
+          'Provide post-launch support as outlined in the agreement'
+        ];
+        addList(elgatoaiResponsibilities);
+      }
+
+      // Intellectual Property
+      if (data.includedSections?.intellectualProperty !== false) {
+        addHeading('INTELLECTUAL PROPERTY', 2);
+        addParagraph('Upon full payment of all fees, the Client will own all custom work product created specifically for this project. elgAtoAi retains rights to general methodologies, techniques, and any pre-existing intellectual property. Third-party components remain subject to their respective licenses.', { fontSize: 12 });
+      }
+
+      // Warranty & Support
+      if (data.includedSections?.warranty !== false) {
+        addHeading('WARRANTY & SUPPORT', 2);
+        addParagraph('elgAtoAi warrants that all services will be performed in a professional manner. We provide a 30-day warranty period for bug fixes on delivered work. This warranty does not cover issues arising from client modifications, third-party changes, or hosting environment changes.', { fontSize: 12 });
+      }
+
+      // Termination
+      if (data.includedSections?.termination !== false) {
+        addHeading('TERMINATION', 2);
+        addParagraph('Either party may terminate this agreement with 30 days written notice. In case of termination, the Client will pay for all work completed up to the termination date. All deliverables completed and paid for will be provided to the Client.', { fontSize: 12 });
+      }
+
+      // Signatures
+      addHeading('SIGNATURES', 2);
+      addParagraph('By signing below, both parties agree to the terms and conditions outlined in this agreement.', { fontSize: 12 });
+      currentY += 15;
+
+      // Two columns for signatures
+      addText('CLIENT', margin, currentY, { fontSize: 12, fontStyle: 'bold' });
+      addText('SERVICE PROVIDER', margin + 90, currentY, { fontSize: 12, fontStyle: 'bold' });
+      currentY += 25;
+
+      pdf.setLineWidth(1);
+      pdf.line(margin, currentY, margin + 70, currentY);
+      pdf.line(margin + 90, currentY, margin + 160, currentY);
+      currentY += 8;
+
+      addText(`${data.clientName}`, margin, currentY, { fontSize: 11 });
+      addText('elgAtoAi', margin + 90, currentY, { fontSize: 11 });
+      currentY += 15;
+
+      addText('Date: _______________', margin, currentY, { fontSize: 10 });
+      addText('Date: _______________', margin + 90, currentY, { fontSize: 10 });
+
+      // Add page numbers to all pages after all content is generated
+      const totalPagesActual = pageNumber;
+
+      // Go through each page and add page numbers
+      for (let i = 1; i <= totalPagesActual; i++) {
+        pdf.setPage(i);
+        pdf.setFontSize(10);
+        pdf.setFont('times', 'normal');
+
+        // Clear any existing text in the footer area first
+        pdf.setFillColor(255, 255, 255);
+        pdf.rect(pageWidth - margin - 30, pageHeight - 20, 30, 10, 'F');
+
+        // Add the page number
+        const pageText = `${i} of ${totalPagesActual}`;
+        const textWidth = pdf.getTextWidth(pageText);
+        pdf.text(pageText, pageWidth - margin - textWidth, pageHeight - 15);
+      }
 
       // Download
-      pdf.save(`Contract-${contract.id}.pdf`);
+      pdf.save(`Contract-${contract.contractId || contract.id || 'document'}.pdf`);
     } catch (error) {
       console.error('Error generating PDF:', error);
       alert('Error generating PDF. Please try again.');
@@ -886,8 +1278,8 @@ const ContractDashboard = () => {
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden">
-          <div className="flex justify-between items-center p-6 border-b">
+        <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+          <div className="flex justify-between items-center p-6 border-b flex-shrink-0">
             <h2 className="text-xl font-semibold">Contract Preview - {previewModal.contract.projectName}</h2>
             <button
               onClick={closePreview}
@@ -896,14 +1288,15 @@ const ContractDashboard = () => {
               <X size={24} />
             </button>
           </div>
-          <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+          <div className="p-6 overflow-y-auto flex-1 min-h-0">
             <div
+              className="contract-content-isolated"
               dangerouslySetInnerHTML={{
                 __html: previewModal.contract.content || generateContractContent(previewModal.contract.data)
               }}
             />
           </div>
-          <div className="flex justify-end space-x-3 p-6 border-t bg-gray-50">
+          <div className="flex justify-end space-x-3 p-6 border-t bg-gray-50 flex-shrink-0">
             <button
               onClick={() => downloadPDF(previewModal.contract)}
               className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"

@@ -24,3 +24,28 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Contract content isolation - prevents CSS custom properties from affecting contract styling */
+.contract-content-isolated {
+  color: initial !important;
+}
+
+.contract-content-isolated * {
+  color: inherit !important;
+}
+
+.contract-content-isolated h1,
+.contract-content-isolated h2,
+.contract-content-isolated h3,
+.contract-content-isolated h4,
+.contract-content-isolated h5,
+.contract-content-isolated h6 {
+  color: inherit !important;
+}
+
+.contract-content-isolated p,
+.contract-content-isolated li,
+.contract-content-isolated span,
+.contract-content-isolated div {
+  color: inherit !important;
+}
